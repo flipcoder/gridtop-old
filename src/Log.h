@@ -43,7 +43,7 @@ public:
     virtual ~Log() {}
 
     void write(const std::string& s, Message::eLoggingLevel lev = Message::LL_INFO);
-    void warning(const std::string&s) { write(s,Message::LL_WARNING); }
+    void warn(const std::string&s) { write(s,Message::LL_WARNING); }
     void error(const std::string&s) {write(s,Message::LL_ERROR);}
 
     unsigned int size() const { return m_cbLog.size(); }

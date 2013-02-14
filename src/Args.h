@@ -90,6 +90,13 @@ class Args
         // std::vector<Args> separate() const {
         // }
 
+        std::string get(unsigned int pos) {}
+        std::string after(unsigned int pos, int offset) {}
+        std::string before(unsigned int pos, int offset) {}
+        std::string after(std::string s, int offset) {}
+        std::string before(std::string s, int offset) {}
+        unsigned int find(std::string s) {}
+
     private:
 
         void analyze();

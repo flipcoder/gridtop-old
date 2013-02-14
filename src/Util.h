@@ -27,7 +27,7 @@ namespace util
     }
 
     template<class Container, class Pred>
-    void remove_if(Container& c, Pred& p) {
+    void remove_if(Container& c, Pred&& p) {
         c.erase(std::remove_if(ENTIRE(c), p), c.end());
     }
 
