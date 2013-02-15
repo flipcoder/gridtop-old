@@ -6,6 +6,8 @@
 #include <memory>
 #include <algorithm>
 #include <boost/process.hpp>
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 #include "Args.h"
 #include "Log.h"
 using namespace std;
@@ -38,7 +40,7 @@ public:
         istringstream ss(s);
 
         read_val(ss, m_ID);
-        read_val(ss, m_Desktop);
+        read_val(ss, m_Workspace);
 
         read_val(ss, x);
         read_val(ss, y);
@@ -61,8 +63,12 @@ public:
     bool active() const { return m_Active; }
     void active(bool b) { m_Active = b; }
 
+    bool minimized() const { return m_Minimized; }
+    void minimized(bool b) { m_Minimized = b; }
+
     bool ignore() const {
-        return is_desktop();
+        // TODO: replace this with a check for the window being the desktop
+        return sticky();
     }
 
     int x_center() const{
@@ -76,15 +82,15 @@ public:
         return y + h/2;
     }
 
-    bool is_desktop() const {
-        return m_Desktop == -1;
+    bool sticky() const {
+        return m_Workspace == -1;
     }
 
     unsigned index_in(const vector<shared_ptr<Window>>& windows)
     {
         for(unsigned i=0; i<windows.size(); ++i)
             if(windows[i].get() == this){
-                LOGf("active window in position %s ", i);
+                //LOGf("active window in position %s ", i);
                 return i;
             }
         throw std::out_of_range("window index");
@@ -101,7 +107,7 @@ public:
         // only consider ignored windows if they're the active one
         // otherwise, remove them
         util::remove_if(windows, [](const shared_ptr<Window>& win) {
-            return win->ignore() && !win->active();
+            return win->ignore() && !win->active() && !win->minimized();
         });
 
         // at() and index_in() may throw out_of_range
@@ -137,7 +143,7 @@ public:
                     break; // silence warnings
             }
         }catch(const out_of_range&){
-            LOG("active window is on edge (target out of range)");
+            //LOG("active window is on edge (target out of range)");
         }
 
         return std::shared_ptr<Window>();
@@ -173,16 +179,18 @@ private:
 
     string m_ID;
     bool m_Active = false;
-    int m_Desktop = 0;
+    bool m_Minimized = false;
+    int m_Workspace= 0;
 };
 
 struct Workspace
 {
-
+    
 };
 
 struct Display
 {
+    
 };
 
 shared_ptr<Window> get_active_window(vector<shared_ptr<Window>>& windows) {
@@ -246,17 +254,32 @@ int main(int argc, const char** argv)
     out = call("wmctrl", { "wmctrl", "-G", "-l" });
     for(const auto& line: out)
     {
-        LOG(line);
+        //LOG(line);
         windows.push_back(make_shared<Window>(line));
 
         // check if active
         if(windows.back()->id() == active_id)
         {
             windows.back()->active(true);
-            LOG("active ^");
+            //LOG("active ^");
         }
 
         // TODO: check if minimized
+        auto wininfo = call("xwininfo", {
+            "xwininfo",
+            "-wm",
+            "-id",
+            windows.back()->id()
+        });
+        try{
+            for(unsigned i=0; i<wininfo.size(); ++i)
+                if(boost::ends_with(wininfo[i], "Window state:"))
+                    if(boost::ends_with(wininfo.at(i+1), "Hidden"))
+                    {
+                        windows.back()->minimized(true);
+                        break;
+                    }
+        }catch(out_of_range&) {}
     }
 
     string dir_string = args.value("focus");
@@ -272,10 +295,10 @@ int main(int argc, const char** argv)
         target = get_active_window(windows)->motion(dir,windows);
         if(target && !target->active())
         {
-            LOGf("switching to: %s", target->id());
+            //LOGf("switching to: %s", target->id());
             call("wmctrl", {"wmctrl", "-i", "-a", target->id()});
         }else{
-            LOG("no target");
+            //LOG("no target");
         }
 
         return 0;
