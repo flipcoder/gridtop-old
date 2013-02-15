@@ -18,7 +18,7 @@ The features I intend to add are in this order:
       behavior, so it will function even when windows are floating freely.
     - I want more than just two directions of motion:
       We will start with the following vim-like motions for grid switching:
-          h, j, k, l, $, ^, G, and GG
+          h, j, k, l, $, ^, G, and gg
 - Window movement, resizing, and grid snapping
     - *coming later*
 

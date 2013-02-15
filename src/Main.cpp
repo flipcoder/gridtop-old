@@ -1,14 +1,34 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <boost/process.hpp>
+#include <limits>
 #include <sstream>
+#include <memory>
+#include <algorithm>
+#include <boost/process.hpp>
 #include "Args.h"
 #include "Log.h"
 using namespace std;
 using namespace util;
 
-class Window
+enum class Motion {
+    LEFT,RIGHT,UP,DOWN,
+    START,END,TOP,BOTTOM
+};
+const map<string,Motion> MotionFromString = {
+    make_pair("left",Motion::LEFT),
+    make_pair("right",Motion::RIGHT),
+    make_pair("up",Motion::UP),
+    make_pair("down",Motion::DOWN),
+
+    make_pair("start",Motion::START),
+    make_pair("end",Motion::END),
+    make_pair("top",Motion::TOP),
+    make_pair("bottom",Motion::BOTTOM)
+};
+
+class Window//:
+    //public enable_shared_from_this<Window>
 {
 public:
     /*
@@ -60,12 +80,96 @@ public:
         return m_Desktop == -1;
     }
 
+    unsigned index_in(const vector<shared_ptr<Window>>& windows)
+    {
+        for(unsigned i=0; i<windows.size(); ++i)
+            if(windows[i].get() == this){
+                LOGf("active window in position %s ", i);
+                return i;
+            }
+        throw std::out_of_range("window index");
+        return 0;
+    }
+
+    /*
+     *  Next window in a specific direction
+     *
+     *  TODO: eventually add a smarter axis overlap check which will require
+     *        better searching.
+     */
+    shared_ptr<Window> motion(Motion motion, vector<shared_ptr<Window>> windows) {
+        // only consider ignored windows if they're the active one
+        // otherwise, remove them
+        util::remove_if(windows, [](const shared_ptr<Window>& win) {
+            return win->ignore() && !win->active();
+        });
+
+        // at() and index_in() may throw out_of_range
+        try{
+            switch(motion)
+            {
+                case Motion::LEFT:
+                    x_sort(windows);
+                    return windows.at(index_in(windows)-1);
+                case Motion::RIGHT:
+                    x_sort(windows);
+                    return windows.at(index_in(windows)+1);
+                case Motion::UP:
+                    y_sort(windows);
+                    return windows.at(index_in(windows)-1);
+                case Motion::DOWN:
+                    y_sort(windows);
+                    return windows.at(index_in(windows)+1);
+
+                case Motion::START:
+                    x_sort(windows);
+                    return windows.at(0);
+                case Motion::END:
+                    x_sort(windows);
+                    return windows.at(max(windows.size(),size_t()+1)-1);
+                case Motion::TOP:
+                    y_sort(windows);
+                    return windows.at(0);
+                case Motion::BOTTOM:
+                    y_sort(windows);
+                    return windows.at(max(windows.size(),size_t()+1)-1);
+                default:
+                    break; // silence warnings
+            }
+        }catch(const out_of_range&){
+            LOG("active window is on edge (target out of range)");
+        }
+
+        return std::shared_ptr<Window>();
+    }
+
     int x = 0;
     int y = 0;
     int w = 0;
     int h = 0;
 
 private:
+    static void x_sort(vector<shared_ptr<Window>>& windows)
+    {
+        sort(ENTIRE(windows),
+            [](const shared_ptr<Window> a,
+               const shared_ptr<Window>& b
+            ){
+                return a->x_center() < b->x_center();
+            }
+        );
+    }
+
+    static void y_sort(vector<shared_ptr<Window>>& windows)
+    {
+        sort(ENTIRE(windows),
+            [](const shared_ptr<Window> a,
+               const shared_ptr<Window>& b
+            ){
+                return a->y_center() < b->y_center();
+            }
+        );
+    }
 
     string m_ID;
     bool m_Active = false;
@@ -80,6 +184,15 @@ struct Workspace
 struct Display
 {
 };
+
+shared_ptr<Window> get_active_window(vector<shared_ptr<Window>>& windows) {
+    auto itr = find_if(ENTIRE(windows),[](const shared_ptr<Window>& a){
+        return a->active();
+    });
+    if(itr == windows.end())
+        return shared_ptr<Window>();
+    return *itr;
+}
 
 enum eOutput {
     USE_STDOUT = 0,
@@ -106,6 +219,7 @@ vector<string> call(
     boost::process::pistream& stream = (choice==USE_STDOUT ?
         child.get_stdout() :
         child.get_stderr()
+
     );
 
     string line;
@@ -115,29 +229,11 @@ vector<string> call(
     return output;
 }
 
-void x_sort(vector<Window>& windows)
-{
-    sort(ENTIRE(windows),
-        [](const Window& a, const Window& b){
-            return a.x_center() < b.x_center();
-        }
-    );
-}
-
-void y_sort(vector<Window>& windows)
-{
-    sort(ENTIRE(windows),
-        [](const Window& a, const Window& b){
-            return a.y_center() < b.y_center();
-        }
-    );
-}
-
 int main(int argc, const char** argv)
 {
     Args args(argc,argv);
 
-    vector<Window> windows;
+    vector<shared_ptr<Window>> windows;
     string active_id;
     vector<string> out;
     
@@ -150,66 +246,43 @@ int main(int argc, const char** argv)
     out = call("wmctrl", { "wmctrl", "-G", "-l" });
     for(const auto& line: out)
     {
-        windows.emplace_back(line);
-        if(windows.back().id() == active_id)
-            windows.back().active(true);
-    }
+        LOG(line);
+        windows.push_back(make_shared<Window>(line));
 
-    // only consider ignored windows if they're the active one
-    // otherwise, remove them
-    util::remove_if(windows, [](const Window& win) {
-        return win.ignore() && !win.active();
-    });
-
-    string dir = args.value("focus");
-    if(!dir.empty())
-    {
-        string target_id;
-        if(dir=="left"){
-            x_sort(windows);
-            auto itr = find_if(ENTIRE(windows),[](const Window& a){
-                return a.active();
-            });
-            if(itr != windows.end() && itr != windows.begin())
-            {
-                --itr;
-                target_id = itr->id();
-            }
-        }else if(dir=="right"){
-            x_sort(windows);
-            auto itr = find_if(ENTIRE(windows),[](const Window& a){
-                return a.active();
-            });
-            if(itr != windows.end() && itr != windows.end()-1)
-            {
-                ++itr;
-                target_id = itr->id();
-            }
-        }else if(dir=="up"){
-            y_sort(windows);
-            auto itr = find_if(ENTIRE(windows),[](const Window& a){
-                return a.active();
-            });
-            if(itr != windows.end() && itr != windows.begin())
-            {
-                --itr;
-                target_id = itr->id();
-            }
-        }else if(dir=="down"){
-            y_sort(windows);
-            auto itr = find_if(ENTIRE(windows),[](const Window& a){
-                return a.active();
-            });
-            if(itr != windows.end() && itr != windows.end()-1)
-            {
-                ++itr;
-                target_id = itr->id();
-            }
+        // check if active
+        if(windows.back()->id() == active_id)
+        {
+            windows.back()->active(true);
+            LOG("active ^");
         }
 
-        if(!target_id.empty() && target_id != active_id)
-            call("wmctrl", {"wmctrl", "-i", "-a", target_id});
+        // TODO: check if minimized
     }
+
+    string dir_string = args.value("focus");
+    if(!dir_string.empty())
+    {
+        shared_ptr<Window> target;
+        Motion dir;
+        try{
+            dir = MotionFromString.at(dir_string); // might throw
+        }catch(out_of_range&){
+            ERROR(PARSE, "direction");
+        }
+        target = get_active_window(windows)->motion(dir,windows);
+        if(target && !target->active())
+        {
+            LOGf("switching to: %s", target->id());
+            call("wmctrl", {"wmctrl", "-i", "-a", target->id()});
+        }else{
+            LOG("no target");
+        }
+
+        return 0;
+    }
+
+    if(args.has("fill"))
+        {}//fill(args, windows);
 
     return 0;
 }

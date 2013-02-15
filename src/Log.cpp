@@ -11,7 +11,7 @@ Log::Log()
 {
     //m_cbLog.set_capacity(LOG_LENGTH);
     m_bStdOut = true;
-    m_LogFile.open(LOG_FILE, ios_base::trunc);
+    //m_LogFile.open(LOG_FILE, ios_base::trunc);
     ios::sync_with_stdio(false);
 }
 
@@ -23,10 +23,8 @@ void Log::write(const std::string& s, Log::Message::eLoggingLevel lev)
     {
         if(lev == Message::LL_WARNING)
             cout << "[WARNING] ";
-        else if(lev == Message::LL_ERROR)
-            cout << "[ERROR] ";
-        //else if(lev == Message::LL_DEBUG)
-        //    cout << "[DEBUG] ";
+        //else if(lev == Message::LL_ERROR)
+        //    cout << "[ERROR] ";
         cout << s << endl;
     }
 
@@ -34,10 +32,8 @@ void Log::write(const std::string& s, Log::Message::eLoggingLevel lev)
     {
         if(lev == Message::LL_WARNING)
             m_LogFile << "[WARNING] ";
-        else if(lev == Message::LL_ERROR)
-            m_LogFile << "[ERROR] ";
-        //else if(lev == Message::LL_DEBUG)
-        //    m_LogFile << "[DEBUG] ";
+        //else if(lev == Message::LL_ERROR)
+        //    m_LogFile << "[ERROR] ";
         m_LogFile << s << endl;
     }
 }
