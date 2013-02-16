@@ -107,7 +107,7 @@ public:
         // only consider ignored windows if they're the active one
         // otherwise, remove them
         util::remove_if(windows, [](const shared_ptr<Window>& win) {
-            return win->ignore() && !win->active() && !win->minimized();
+            return (win->ignore() && !win->active()) || win->minimized();
         });
 
         // at() and index_in() may throw out_of_range
@@ -274,11 +274,15 @@ int main(int argc, const char** argv)
         try{
             for(unsigned i=0; i<wininfo.size(); ++i)
                 if(boost::ends_with(wininfo[i], "Window state:"))
+                {
+                    LOGf("state %s", wininfo.at(i));
                     if(boost::ends_with(wininfo.at(i+1), "Hidden"))
                     {
+                        LOGf("hidden %s", wininfo.at(i+1));
                         windows.back()->minimized(true);
                         break;
                     }
+                }
         }catch(out_of_range&) {}
     }
 
