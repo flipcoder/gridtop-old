@@ -31,6 +31,9 @@ The features I intend to add are in this order:
     - I want more than just two directions of motion:
       We will start with the following vim-like motions for grid switching:
           h, j, k, l, $, ^, G, and gg
+- Toggling window decorations (once I switch to libwnck)
+- Window animations/easing (once I have the daemon in place + libwnck)
+    - Already have the code for this. I will be adding it soon.
 
 - Development plans
     - I'll be switching to libwnck (instead of wmctrl+xprop calls) soon.
@@ -41,12 +44,14 @@ The features I intend to add are in this order:
     - I'm not sure if I want this program to handle the hotkeys itself or if
       they should be bound by the user.  The more vi-like I make it, the more
       I'm considering having different "modes" that change the effect of
-      hotkeys as the program runs.
+      hotkeys as the program runs
       
 - Window actions, in order of priority
     - *place*
         - the active window is pushed into the area with greatest remaining area, to prevent overlapping another window.
           if the window does not overlap anything, it is simply expanded.
+    - *push*
+        - moves the window in a direction until it collides with another window
     - *fit*
         - windows that are overlapping are pushed away from eachother and possibly resized if the push hits the edge of the screen.  Variable-sized border "gaps" will be supported.  If the fit fails, the most (in terms of area) overlapped windows will be minimized.
     - *fill*
