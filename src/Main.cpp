@@ -10,6 +10,8 @@
 #include <boost/algorithm/string.hpp>
 #include "Args.h"
 #include "Log.h"
+#include "Freq.h"
+#include "Animation.h"
 using namespace std;
 using namespace util;
 
