@@ -142,6 +142,13 @@ class Animation:
     public:
     
         Animation() = default;
+        Animation(T current):
+            m_Current(current)
+        {}
+        Animation& operator=(T a){
+            m_Current = a;
+            return *this;
+        }
 
         Animation(
             Waypoint<T> initial,

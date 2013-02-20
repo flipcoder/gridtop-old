@@ -8,6 +8,7 @@
 enum class ErrorCode: unsigned int
 {
     UNKNOWN = 0,
+    GENERAL,
 
     INIT,
     DISPLAY,
@@ -27,11 +28,12 @@ enum class ErrorCode: unsigned int
 
 static const char* ErrorString[] =  {
     "",
+    "An error occurred",
 
     "Unable to initialize library",
     "Failed to set display mode",
     "Failed to load library",
-    "Version is unsupported",
+    "Version mismatch",
 
     "Unable to read resource",
     "Unable to write resource",
