@@ -1,64 +1,89 @@
 # gridtop (very early stages)
 https://github.com/flipcoder/gridtop
-
 Copyright (c) 2013, Grady O'Connell
 
-A tiled window managing application that can be run on top of Unity, Gnome,
-KDE, Cinnamon, etc.  As long as your DE is EWMH compliant.
+A grid-based tiled window managing application that can be run on top of any
+EMWH-compliant window manager.
 
-It will have vim-like keys for changing focus of windows (win+hjkl), as well as
-movement, and resizing.  It will support multiple monitors and workspaces.
-
-Right now it's just a command line program that you can bind to keys.  I will
-be switching it to being a background daemon soon so I can have persistence,
-like window position history, and tags.
+Gridtop commands can be specified indivdually on the command line.  They are
+then piped to the background daemon (which is spawned if it is not running).
+The background daemon deals with managing all the window positions, scheduling
+animations and state changes based on the user-specified operators and motions.
 
 I'm very ambitious with my goals usually, but I'd like this to eventually
 replace any need for someone to run a tiled window manager.  Developers living
 in separate DEs tend to stop focusing on the average user experience.  This is
 one of the reasons I think the linux desktop appears weaker than it should.
 
+My motivation for writing this is that I dislike the way window managers
+(including tiled) deal with managing and cycling through windows.  This is my
+attempt at creating the ideal window manager.
+
+It is grid-based, meaning that windows prefer to snap to a specific grid, as
+well as preserving spacing.  Everything should be user configurable.
+
+Windows are manipulated through vim-like commands.
+
 # Features and Plans
 
 The features I intend to add are in this order:
-- Directional focusing/alt-tab (win+hjkl) [Done]
-    - Something that is seriously missing in modern window managers is
+- Directional focusing/alt-tab (win+hjkl) [Almost done]
+    - Something that is seriously missing in non-tiled window managers is
       directional focusing.  If i want to move to the window directly on my
       left, I should be able to hit win+h (or equivalent) and it should be
       instant.
     - I don't want to be required to enter a "tiled mode" to have this
       behavior, so it will function even when windows are floating freely.
-    - I want more than just two directions of motion:
-      We will start with the following vim-like motions for grid switching:
-          h, j, k, l, $, ^, G, and gg
-- Toggling window decorations (once I switch to libwnck)
-- Window animations/easing (once I have the daemon in place + libwnck)
-    - Already have the code for this. I will be adding it soon.
+    - I want more than just two directions of motion.
+- Toggling window decorations
+- Window animations/easing [Done]
+    - Not just because it looks awesome, but beacuse it is more clear what
+      is going on.
 
 - Development plans
-    - I'll be switching to libwnck (instead of wmctrl+xprop calls) soon.
-    - The program itself right now is called for each action.  I'll switch
-      to a background daemon that is launched and each command will be done
-      through IPC.  (I already have the code for this, I just haven't added
-      it to this project.)
-    - I'm not sure if I want this program to handle the hotkeys itself or if
-      they should be bound by the user.  The more vi-like I make it, the more
-      I'm considering having different "modes" that change the effect of
-      hotkeys as the program runs
-      
+    - Switch to libwnck [Done]
+    - Switch to daemon+IPC [Done]
+    - Eventually, i'd like to explore using mouse+touch commands to make using
+      this more user-friendly. (A user-friendly tiled window manager!?)
+      I'll codename this feature "What-Windows-8-Should've-Been"
+
 - Window actions, in order of priority
-    - *place*
-        - the active window is pushed into the area with greatest remaining area, to prevent overlapping another window.
-          if the window does not overlap anything, it is simply expanded.
-    - *push*
-        - moves the window in a direction until it collides with another window
-    - *fit*
-        - windows that are overlapping are pushed away from eachother and possibly resized if the push hits the edge of the screen.  Variable-sized border "gaps" will be supported.  If the fit fails, the most (in terms of area) overlapped windows will be minimized.
-    - *fill*
-        - the active window is expanded as far as possible without overlap.
-    - *snap*
-        - windows are snapped to a user-defined grid making it nicer to resize manually.    
-    - *minimized swap*
-        - the active window will be swapped with the next minimized window.
-    - *and much more, of course*
+    - *modes*
+        - *visual* (coming later)
+            - multi-select windows or grid positions, to apply commands to more than one window
+    - *operators*
+        - *focus* (default)
+            - changes which window is active
+        - *move/snap*
+            - moves the window along the grid
+            - the first move snaps, if the window does not fit the grid
+        - *split*
+            - halves the window and spawns a new window depending on the
+              parameters
+        - *swap*
+            - swap active window with the window matching the given motion
+        - *extend*
+            - spawns a new window in the direction depending on the motion
+        - *place*
+            - the active window is pushed into the area with greatest remaining area, to prevent overlapping another window.
+              if the window does not overlap anything, it is simply expanded.
+        - *push*
+            - moves the active window in the motion's direction until it collides with another window or display edge
+        - *fill*
+            - the active window is expanded as far as possible without overlap in the given direction
+    - *actions*
+        - *minimized swap*
+            - the active window will be swapped with the next minimized window.
+    - *motions*
+        - By default, motions refer to windows in the specific direction, but
+          I'll add a way to extend these to allow for targeting workspaces and
+          displays similarly.
+        - *left*
+        - *right*
+        - *up*
+        - *down*
+        - *left-edge*
+        - *right-edge*
+        - *top*
+        - *bottom*
 
