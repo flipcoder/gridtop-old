@@ -6,8 +6,11 @@
 #include "Daemon.h"
 #include "Window.h"
 #include "Freq.h"
+#include "ICommand.h"
+#include "CommandResolver.h"
 #include <memory>
 #include <vector>
+#include <list>
 #include <string>
 
 class WindowManager:
@@ -16,48 +19,36 @@ class WindowManager:
 {
     public:
 
-        enum class Motion {
-            LEFT,RIGHT,UP,DOWN,
-            START,END,TOP,BOTTOM
-        };
-
         WindowManager(const Args& args);
-
         virtual ~WindowManager();
 
         virtual void run() override;
 
         /*
-         * Executes the provided args as WindowManager commands.
-         * Eventually, this function will pipe to the daemon process.
-         * For now, it just performs the commands locally.
-         *
-         * Method will be changed to static when WindowManager is a daemon
+         * Perform the args action on the daemon side
          */
         virtual std::string action(const Args& args) override;
 
-        void logic(Freq::Time t) override {
-            for(auto& win: m_Windows)
-                win->logic(t);
-        }
+        void logic(Freq::Time t) override;
         
-    private:
+        std::list<std::shared_ptr<ICommand>>& pending() {
+            return m_Pending;
+        }
+        const std::list<std::shared_ptr<ICommand>>& commands() const {
+            return m_Pending;
+        }
 
-        void recache();
+    private:
 
         WnckScreen* m_pScreen = nullptr;
         std::vector<std::shared_ptr<Window>> m_Windows;
 
-        std::weak_ptr<Window>  m_pActiveWindow;
-        unsigned int m_ActiveWindowIndex;
+        Commands m_Commands;
+        CommandResolver m_CommandResolver;
+
+        std::list<std::shared_ptr<ICommand>> m_Pending;
 
         Freq m_Timer;
-
-        /*
-         * If realtime is false, recacheing is done only on specific commands
-         * If realtime is true, recacheing is done every frame
-         */
-        bool m_bRealtime = false;
 };
 
 #endif

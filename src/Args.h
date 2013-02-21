@@ -86,6 +86,13 @@ class Args
             return boost::algorithm::join(m_Args, "\n");
         }
 
+        std::vector<std::string> all() const {
+            return m_Args;
+        }
+        std::vector<std::string> other() const {
+            return m_Other;
+        }
+
         // TODO: tokenize based on arg separators
         // std::vector<Args> separate() const {
         // }
@@ -99,11 +106,16 @@ class Args
 
     private:
 
+        /*
+         * precondition: everything must be clear, run once during ctor
+         */
         void analyze();
 
         std::vector<std::string> m_Args;
         //std::vector<std::pair<std::string, std::string>> m_Values;
         std::map<std::string, std::string> m_Values;
+
+        std::vector<std::string> m_Other;
 };
 
 #endif

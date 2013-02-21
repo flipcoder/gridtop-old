@@ -22,6 +22,10 @@ void Args :: analyze()
                     if(!m_Values.insert({key,value}).second)
                         throw std::exception(); // failed to insert
             }
+        }else if(boost::starts_with(arg, "-")){
+            // TODO: expand to -- equivalent?
+        }else{
+            m_Other.push_back(arg);
         }
     }
 }

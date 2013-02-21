@@ -25,12 +25,7 @@ class Window:
         }
 
         glm::vec2 pos() {
-            if(!m_Pos.elapsed())
-                return m_Pos.get();
-            else
-            {
-                
-            }
+            return m_Pos.get();            
         }
 
         glm::vec2 size() const {
@@ -69,13 +64,12 @@ class Window:
         void logic(Freq::Time t) override;
 
     private:
+
         Animation<glm::vec2> m_Pos;
         Animation<glm::vec2> m_Size;
 
         mutable WnckWindow* m_pWindow;
         WindowManager* m_pWindowManager;
-
-        bool m_AutoSnap = false;
 
         mutable std::string m_Name;
 };

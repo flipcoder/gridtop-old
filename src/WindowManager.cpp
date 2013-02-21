@@ -4,7 +4,8 @@
 using namespace std;
 
 WindowManager :: WindowManager(const Args& args):
-    Daemon(args)
+    Daemon(args),
+    m_CommandResolver(&m_Commands)
 {
     util::scoped_dtor<WindowManager> dtor(this);
 
@@ -37,6 +38,21 @@ WindowManager :: WindowManager(const Args& args):
     dtor.resolve();
 }
 
+
+void WindowManager :: logic(Freq::Time t)
+{
+    for(auto& command: m_Pending)
+        command->logic(t);
+
+    util::remove_if(m_Pending, [](const std::shared_ptr<ICommand>& c){
+        return c->expired();
+    });
+
+    // TODO: update window list with new windows
+    for(auto& win: m_Windows)
+        win->logic(t);
+}
+
 void WindowManager:: run()
 {
     while(true)
@@ -49,7 +65,6 @@ void WindowManager:: run()
     }
 }
 
-
 WindowManager :: ~WindowManager()
 {
     wnck_shutdown();
@@ -57,6 +72,14 @@ WindowManager :: ~WindowManager()
 
 string WindowManager :: action(const Args& args)
 {
+    std::vector<std::string> cmd_args = args.other();
+    std::vector<std::tuple<WindowManager*, std::string>> cmd_args_tuple;
+    transform(ENTIRE(cmd_args), cmd_args_tuple.begin(),
+        [this](const std::string& s){
+            return make_tuple(this, s);
+        }
+    );
+    m_Commands.create_all(cmd_args_tuple);
     return string();
 }
 
