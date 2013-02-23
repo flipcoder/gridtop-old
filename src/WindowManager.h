@@ -8,6 +8,7 @@
 #include "Freq.h"
 #include "ICommand.h"
 #include "CommandResolver.h"
+#include "Operator.h"
 #include <memory>
 #include <vector>
 #include <list>
@@ -34,14 +35,15 @@ class WindowManager:
         std::list<std::shared_ptr<ICommand>>& pending() {
             return m_Pending;
         }
-        const std::list<std::shared_ptr<ICommand>>& commands() const {
-            return m_Pending;
+        std::shared_ptr<Operator>& default_operator() {
+            return m_pDefaultOperator;
         }
 
     private:
 
         WnckScreen* m_pScreen = nullptr;
         std::vector<std::shared_ptr<Window>> m_Windows;
+        std::shared_ptr<Operator> m_pDefaultOperator;
 
         Commands m_Commands;
         CommandResolver m_CommandResolver;

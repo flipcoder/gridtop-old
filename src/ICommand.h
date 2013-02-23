@@ -11,8 +11,13 @@ class ICommand:
     public IRealtime
 {
     public:
+        /*
+         *  Constructor is called before the WindowManager has record of this
+         *  in its command stack.  So assume self is not included.
+         */
         virtual ~ICommand() {}
-        virtual bool expired() const = 0;
+        //virtual bool expired() const = 0;
+        virtual bool pend() const = 0;
 };
 
 typedef Factory<ICommand, std::tuple<

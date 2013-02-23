@@ -3,19 +3,19 @@
 
 #include <string>
 #include <vector>
+#include "Motions.h"
+#include "Operators.h"
 
-enum class eCommand : unsigned int
+enum class eCommand : unsigned
 {
-    MOTION,
-    OPERATOR,
+    MOTION, // -> motion IDs start here! (see Motions.h)
+    MOTIONS_END = (MOTION + (unsigned)eMotion::MAX - 1),
+
+    OPERATOR, // -> operator IDs start here! (see Operators.h)
+    OPERATORS_END = (OPERATOR + (unsigned)eOperator::MAX - 1),
+
     MAX
 };
-
-const std::vector<std::string> g_CommandNames = {
-    "motion"
-    "operator",
-};
-
 
 #endif
 

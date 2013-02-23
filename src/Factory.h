@@ -12,7 +12,7 @@ template<class Class, class /*...*/ T>
 class Factory
 {
     private:
-
+        
         // derived class make_shared() functors
         std::vector<
             std::function<

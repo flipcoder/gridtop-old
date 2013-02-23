@@ -39,7 +39,6 @@ The features I intend to add are in this order:
 - Window animations/easing [Done]
     - Not just because it looks awesome, but beacuse it is more clear what
       is going on.
-
 - Development plans
     - Switch to libwnck [Done]
     - Switch to daemon+IPC [Done]
@@ -56,7 +55,8 @@ The features I intend to add are in this order:
             - changes which window is active
         - *move/snap*
             - moves the window along the grid
-            - the first move snaps, if the window does not fit the grid
+            - if the operator is specified twice, the active window is just
+              snapped to the grid
         - *split*
             - halves the window and spawns a new window depending on the
               parameters
@@ -71,13 +71,21 @@ The features I intend to add are in this order:
             - moves the active window in the motion's direction until it collides with another window or display edge
         - *fill*
             - the active window is expanded as far as possible without overlap in the given direction
-    - *actions*
-        - *minimized swap*
-            - the active window will be swapped with the next minimized window.
+        - *stick*
+            - sticks the window to the window in the target direction, so that movement
+              of the parent will reposition this window.
+        - *conceal*
+            - moves active window behind target so that it can be cycled
+        - *cycle*
+            - moves through conceal windows behind active window
     - *motions*
         - By default, motions refer to windows in the specific direction, but
           I'll add a way to extend these to allow for targeting workspaces and
           displays similarly.
+        - *self*
+            - operator-specific, much like 'dd' is to 'd' in vim, it usually
+              applies only the current window, and can also be specified by
+              triggering the operator twice.
         - *left*
         - *right*
         - *up*

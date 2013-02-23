@@ -3,6 +3,7 @@
 
 #include "ICommand.h"
 #include "Commands.h"
+#include <map>
 class WindowManager;
 
 class CommandResolver
@@ -17,7 +18,13 @@ class CommandResolver
         ) const;
 
     private:
+
+        void init_operators();
+        void init_motions();
+        //void init_actions();
+
         Commands* m_pCommands;
+        std::map<std::string, unsigned> m_CommandString;
 };
 
 #endif

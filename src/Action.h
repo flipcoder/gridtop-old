@@ -9,7 +9,7 @@ class WindowManager;
  *
  *  Examples:
  *      - Cancelation of all queued operators
- *      - Return to default mode
+ *      - Modal changes
  */
 
 class Action:
@@ -21,7 +21,7 @@ class Action:
         {}
 
         virtual ~Action() {}
-        virtual bool expired() const override {
+        virtual bool pend() const override {
             return false;
         }
     private:

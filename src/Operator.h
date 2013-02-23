@@ -12,11 +12,12 @@ class Operator:
             m_pWM(std::get<0>(args))
         {}
         virtual ~Operator() {}
-        virtual bool expired() const override {
-            return false;
+        virtual bool pend() const override {
+            return true;
         }
     private:
         WindowManager* m_pWM;
 };
 
 #endif
+

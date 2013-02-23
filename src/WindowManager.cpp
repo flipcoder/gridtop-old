@@ -1,6 +1,7 @@
 #include "WindowManager.h"
 #include "Util.h"
 #include "Log.h"
+#include "FocusOperator.h"
 using namespace std;
 
 WindowManager :: WindowManager(const Args& args):
@@ -35,6 +36,9 @@ WindowManager :: WindowManager(const Args& args):
         }
     }
 
+    m_pDefaultOperator = std::make_shared<FocusOperator>(
+        make_tuple(this,string())
+    );
     dtor.resolve();
 }
 
@@ -44,9 +48,9 @@ void WindowManager :: logic(Freq::Time t)
     for(auto& command: m_Pending)
         command->logic(t);
 
-    util::remove_if(m_Pending, [](const std::shared_ptr<ICommand>& c){
-        return c->expired();
-    });
+    //util::remove_if(m_Pending, [](const std::shared_ptr<ICommand>& c){
+    //    return c->expired();
+    //});
 
     // TODO: update window list with new windows
     for(auto& win: m_Windows)
