@@ -45,6 +45,9 @@ class WindowManager:
         std::vector<std::shared_ptr<Window>> m_Windows;
         std::shared_ptr<Operator> m_pDefaultOperator;
 
+        Freq::Alarm m_PendAlarm;
+        Freq::Time m_PendTime;
+
         Commands m_Commands;
         CommandResolver m_CommandResolver;
 

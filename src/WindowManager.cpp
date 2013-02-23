@@ -11,6 +11,7 @@ WindowManager :: WindowManager(const Args& args):
     util::scoped_dtor<WindowManager> dtor(this);
 
     // TODO: before we do anything, load in user configuration
+    m_PendTime = Freq::Time(1000);
 
     WnckScreen* screen = wnck_screen_get_default();
     wnck_screen_force_update(screen);
@@ -39,12 +40,18 @@ WindowManager :: WindowManager(const Args& args):
     m_pDefaultOperator = make_shared<FocusOperator>(
         make_tuple(this,string())
     );
+
+
     dtor.resolve();
 }
 
 
 void WindowManager :: logic(Freq::Time t)
 {
+    m_PendAlarm.logic(t);
+    if(m_PendAlarm.elapsed())
+        m_Pending.clear();
+
     for(auto& command: m_Pending)
         command->logic(t);
 
@@ -89,6 +96,14 @@ string WindowManager :: action(const Args& args)
         auto cmd = m_Commands.create(c);
         if(cmd)
             m_Pending.push_back(cmd);
+
+        if(cmd->pending())
+            m_PendAlarm.set(m_PendTime);
+        else
+        {
+            c.clear();
+            m_PendAlarm.stop();
+        }
     }
     return string();
 }

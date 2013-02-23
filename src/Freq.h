@@ -130,6 +130,10 @@ public:
         }
 
         virtual ~Alarm() {}
+
+        void stop() {
+            m_ulAlarmTime = m_ulStartTime;
+        }
         
         Alarm& operator+=(Freq::Time t) {
             m_ulAlarmTime += t.ms();
