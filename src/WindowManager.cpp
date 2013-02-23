@@ -36,7 +36,7 @@ WindowManager :: WindowManager(const Args& args):
         }
     }
 
-    m_pDefaultOperator = std::make_shared<FocusOperator>(
+    m_pDefaultOperator = make_shared<FocusOperator>(
         make_tuple(this,string())
     );
     dtor.resolve();
@@ -48,7 +48,7 @@ void WindowManager :: logic(Freq::Time t)
     for(auto& command: m_Pending)
         command->logic(t);
 
-    //util::remove_if(m_Pending, [](const std::shared_ptr<ICommand>& c){
+    //util::remove_if(m_Pending, [](const shared_ptr<ICommand>& c){
     //    return c->expired();
     //});
 
@@ -76,14 +76,20 @@ WindowManager :: ~WindowManager()
 
 string WindowManager :: action(const Args& args)
 {
-    std::vector<std::string> cmd_args = args.other();
-    std::vector<std::tuple<WindowManager*, std::string>> cmd_args_tuple;
-    transform(ENTIRE(cmd_args), cmd_args_tuple.begin(),
-        [this](const std::string& s){
+    vector<string> cmd_args = args.other();
+    vector<tuple<WindowManager*, string>> cmd_args_tuple;
+    transform(ENTIRE(cmd_args), std::back_inserter(cmd_args_tuple),
+        [this](const string& s){
             return make_tuple(this, s);
         }
     );
-    m_Commands.create_all(cmd_args_tuple);
+    
+    for(auto& c: cmd_args_tuple)
+    {
+        auto cmd = m_Commands.create(c);
+        if(cmd)
+            m_Pending.push_back(cmd);
+    }
     return string();
 }
 

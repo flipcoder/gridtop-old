@@ -3,6 +3,7 @@
 #include "Operator.h"
 #include "Action.h"
 #include "WindowManager.h"
+#include "Log.h"
 #include "Util.h"
 
 #include "FocusOperator.h"
@@ -48,6 +49,7 @@ unsigned CommandResolver :: resolve(
     >& args
 ) const {
     try{
+        LOGf("Command: %s", std::get<1>(args));
         return m_CommandString.at(std::get<1>(args));
     }catch(const std::out_of_range&){
         return std::numeric_limits<unsigned>::max();

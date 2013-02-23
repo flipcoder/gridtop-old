@@ -6,6 +6,7 @@
 #include <memory>
 //#include <boost/any.hpp>
 #include <cassert>
+#include <stdexcept>
 #include <limits>
 
 template<class Class, class /*...*/ T>
@@ -66,15 +67,17 @@ class Factory
         }
 
         std::shared_ptr<Class> create(unsigned int id, const T& arg) const {
-            return m_Classes.at(id)(arg);
+            try{
+                return m_Classes.at(id)(arg);
+            }catch(const std::out_of_range&){}
+            return std::shared_ptr<Class>();
         }
 
         std::shared_ptr<Class> create(const T& arg) const {
             unsigned int id = m_Resolver(arg);
             if(id != std::numeric_limits<unsigned int>::max())
                 return create(id, arg);
-            else
-                return std::shared_ptr<Class>();
+            return std::shared_ptr<Class>();
         }
 
         std::vector<std::shared_ptr<Class>> create_all(
