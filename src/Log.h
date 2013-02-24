@@ -44,7 +44,13 @@ public:
 
     void write(const std::string& s, Message::eLoggingLevel lev = Message::LL_INFO);
     void warn(const std::string&s) { write(s,Message::LL_WARNING); }
-    void error(const std::string&s) {write(s,Message::LL_ERROR);}
+    void error(ErrorCode err, const std::string& s) {
+        write(
+            (boost::format("%s: %s") % g_ErrorString[(unsigned)err] % s).str(),
+            Message::LL_ERROR
+        );
+    }
+    void error(const std::string& s) {write(s,Message::LL_ERROR);}
 
     unsigned int size() const { return m_cbLog.size(); }
     bool empty() const { return (size()==0); }
@@ -68,8 +74,8 @@ public:
     throw Error(ErrorCode::CODE, X);\
 }
 #define ERRORf(CODE,X,Y) {\
-    const std::string _err = (boost::format(X) % Y).str();\
-    Log::get().error(_err);\
+    std::string _err = (boost::format(X) % Y).str();\
+    Log::get().error(ErrorCode::CODE, _err);\
     throw Error(ErrorCode::CODE, _err);\
 }
 

@@ -13,11 +13,13 @@ class ICommand:
     public:
         /*
          *  Constructor is called before the WindowManager has record of this
-         *  in its command stack.  So assume self is not included.
+         *  in its command stack.  So assume self is not included during ctor,
+         *  but included during execute()
          */
         virtual ~ICommand() {}
         //virtual bool expired() const = 0;
         virtual bool pending() const = 0;
+        virtual void execute() {}
 };
 
 typedef Factory<ICommand, std::tuple<

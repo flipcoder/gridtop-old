@@ -3,6 +3,7 @@
 
 #include "ICommand.h"
 class WindowManager;
+class Motion;
 
 class Operator:
     public ICommand
@@ -15,7 +16,7 @@ class Operator:
         virtual bool pending() const override {
             return true;
         }
-    private:
+    protected:
         WindowManager* m_pWM;
 };
 

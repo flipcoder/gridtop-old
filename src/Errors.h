@@ -8,10 +8,9 @@
 enum class ErrorCode: unsigned int
 {
     UNKNOWN = 0,
-    GENERAL,
 
+    GENERAL,
     INIT,
-    DISPLAY,
     LIBRARY,
     VERSION,
 
@@ -26,18 +25,17 @@ enum class ErrorCode: unsigned int
     MAX
 };
 
-static const char* ErrorString[] =  {
+static const char* g_ErrorString[] =  {
     "",
-    "An error occurred",
 
-    "Unable to initialize library",
-    "Failed to set display mode",
+    "An error occurred",
+    "Unable to initialize",
     "Failed to load library",
     "Version mismatch",
 
-    "Unable to read resource",
-    "Unable to write resource",
-    "Resource parsing error",
+    "Unable to read",
+    "Unable to write",
+    "Parse error",
     "Failed to perform action",
 
     "Failed to obtain lock",
@@ -51,11 +49,11 @@ class Error:
         std::string m_Msg;
     public:
         //Error(ErrorCode code = ErrorCode::UNKNOWN, const char* text):
-        //    std::runtime_error(ErrorString[(int)code])
+        //    std::runtime_error(g_ErrorString[(int)code])
         //{
         //}
         Error(ErrorCode code = ErrorCode::UNKNOWN, const std::string& desc = std::string()):
-            std::runtime_error(ErrorString[(int)code])
+            std::runtime_error(g_ErrorString[(unsigned)code])
         {
             assert(code < ErrorCode::MAX);
 
@@ -71,11 +69,11 @@ class Error:
                 //assert(false);
             }
             else if(!desc.empty())
-                m_Msg = std::string(ErrorString[(int)code]) + ": " + desc;
+                m_Msg = std::string(g_ErrorString[(unsigned)code]) + ": " + desc;
             else
-                m_Msg = ErrorString[(int)code];
+                m_Msg = g_ErrorString[(unsigned)code];
 
-            std::cout << m_Msg << std::endl;
+            //std::cout << m_Msg << std::endl;
         }
         const char* what() const noexcept override {
             if(!m_Msg.empty())

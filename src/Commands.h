@@ -5,6 +5,7 @@
 #include <vector>
 #include "Motions.h"
 #include "Operators.h"
+#include "Hints.h"
 
 enum class eCommand : unsigned
 {
@@ -13,6 +14,9 @@ enum class eCommand : unsigned
 
     OPERATOR, // -> operator IDs start here! (see Operators.h)
     OPERATORS_END = (OPERATOR + (unsigned)eOperator::MAX - 1),
+
+    HINT, // -> hint IDs start here! (see Hints.h)
+    HINTS_END = (HINT + (unsigned)eHint::MAX - 1),
 
     MAX
 };

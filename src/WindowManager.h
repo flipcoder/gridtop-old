@@ -19,7 +19,7 @@ class WindowManager:
     public Daemon
 {
     public:
-
+        
         WindowManager(const Args& args);
         virtual ~WindowManager();
 
@@ -35,15 +35,16 @@ class WindowManager:
         std::list<std::shared_ptr<ICommand>>& pending() {
             return m_Pending;
         }
-        std::shared_ptr<Operator>& default_operator() {
-            return m_pDefaultOperator;
-        }
+        //std::shared_ptr<Operator>& default_operator() {
+        //    return m_pDefaultOperator;
+        //}
+
+        void execute_default_operator();
 
     private:
 
         WnckScreen* m_pScreen = nullptr;
         std::vector<std::shared_ptr<Window>> m_Windows;
-        std::shared_ptr<Operator> m_pDefaultOperator;
 
         Freq::Timeline m_Timeline;
         Freq::Alarm m_PendAlarm;

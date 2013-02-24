@@ -2,6 +2,7 @@
 #include "Motion.h"
 #include "Operator.h"
 #include "Action.h"
+#include "Hint.h"
 #include "WindowManager.h"
 #include "Log.h"
 #include "Util.h"
@@ -15,8 +16,10 @@ CommandResolver :: CommandResolver(Commands* factory):
 {
     assert(m_pCommands);
 
-    init_motions();
-    init_operators();
+    unsigned i = 0;
+    init_motions(i);
+    init_operators(i);
+    init_hints(i);
 
     m_pCommands->register_resolver(bind(
         &CommandResolver::resolve,
@@ -25,21 +28,34 @@ CommandResolver :: CommandResolver(Commands* factory):
     ));
 }
 
-void CommandResolver :: init_motions()
+void CommandResolver :: init_motions(unsigned& offset)
 {
     m_pCommands->register_class<Motion>();
 
     for(unsigned i=0;i<(unsigned)eMotion::MAX; ++i)
-        m_CommandString[g_MotionString[i]] = (unsigned)eCommand::MOTION;
+        m_CommandString[g_MotionString[i]] = offset; // same class
+
+    ++offset; // same class
 }
 
-void CommandResolver :: init_operators()
+void CommandResolver :: init_operators(unsigned& offset)
 {
     m_pCommands->register_class<FocusOperator>();
 
     for(unsigned i=0;i<(unsigned)eOperator::MAX; ++i)
-        m_CommandString[g_OperatorString[i]] =
-            (unsigned)eCommand::OPERATOR + i;
+        m_CommandString[g_OperatorString[i]] = offset + i; // sub-classes
+
+    offset += (unsigned)eOperator::MAX; // sub-classes
+}
+
+void CommandResolver :: init_hints(unsigned& offset)
+{
+    m_pCommands->register_class<Hint>();
+
+    for(unsigned i=0;i<(unsigned)eHint::MAX; ++i)
+        m_CommandString[g_HintString[i]] = offset; // same class
+
+    ++offset; // same class
 }
 
 unsigned CommandResolver :: resolve(

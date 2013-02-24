@@ -2,6 +2,7 @@
 #define _MOTION_H
 
 #include "ICommand.h"
+#include "Commands.h"
 #include "Util.h"
 class WindowManager;
 
@@ -15,11 +16,24 @@ class Motion:
         virtual ~Motion() {}
 
         virtual bool pending() const override {
-            return true;
+            return false;
         }
 
-    private:
+        virtual void execute() override;
+
+        unsigned bit() const {
+            return Motion::bit(m_ID);
+        }
+        eMotion id() const {
+            return m_ID;
+        }
+        static unsigned bit(eMotion m) {
+            return 1<<(unsigned)m;
+        }
+    protected:
         WindowManager* m_pWM;
+    private:
+        eMotion m_ID;
 };
 
 #endif

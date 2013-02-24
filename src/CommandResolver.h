@@ -19,8 +19,9 @@ class CommandResolver
 
     private:
 
-        void init_operators();
-        void init_motions();
+        void init_operators(unsigned& offset);
+        void init_motions(unsigned& offset);
+        void init_hints(unsigned& offset);
         //void init_actions();
 
         Commands* m_pCommands;

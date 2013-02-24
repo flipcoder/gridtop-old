@@ -22,8 +22,9 @@ int main(int argc, const char** argv)
         try {
             auto daemon = std::make_shared<WindowManager>(args);
             daemon->run();
+        } catch(const Error&) {
         } catch(const std::exception& e) {
-            std::cout << e.what() << std::endl;
+            ERROR(GENERAL, e.what());
             return 1;
         }
         return 0;
@@ -34,8 +35,9 @@ int main(int argc, const char** argv)
     {
         try{
             Daemon::ensure_process();
-        }catch(const std::exception& e) {
-            std::cout << e.what() << std::endl;
+        } catch(const Error&) {
+        } catch(const std::exception& e) {
+            ERROR(GENERAL, e.what());
             return 1;
         }
         return 0;

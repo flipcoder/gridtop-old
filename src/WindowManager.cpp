@@ -38,20 +38,33 @@ WindowManager :: WindowManager(const Args& args):
         }
     }
 
-    m_pDefaultOperator = make_shared<FocusOperator>(
-        make_tuple(this,string())
-    );
-
-
     dtor.resolve();
 }
 
+void WindowManager :: execute_default_operator()
+{
+    // TODO: probably better to insert left of the motions
+    //       but this is good for now
+    m_Pending.push_front(make_shared<FocusOperator>(
+        make_tuple(this, string())
+    ));
+    (*m_Pending.begin())->execute();
+    m_Pending.clear();
+    m_PendAlarm.stop();
+}
 
 void WindowManager :: logic(Freq::Time t)
 {
     m_Timeline.logic(t);
     if(m_PendAlarm.elapsed())
-        m_Pending.clear();
+    {
+        if(!m_Pending.empty())
+        {
+            LOG("execute!");
+            m_Pending.back()->execute();
+            m_Pending.clear();
+        }
+    }
 
     for(auto& command: m_Pending)
         command->logic(t);
@@ -95,13 +108,16 @@ string WindowManager :: action(const Args& args)
     for(auto& c: cmd_args)
     {
         auto cmd = m_Commands.create(make_tuple(this, c));
-        if(cmd)
-            m_Pending.push_back(cmd);
+        if(!cmd)
+            ERRORf(PARSE, "command \"%s\"", c);
+
+        m_Pending.push_back(cmd);
 
         if(cmd->pending())
             m_PendAlarm.set(m_PendTime);
         else
         {
+            cmd->execute();
             c.clear();
             m_PendAlarm.stop();
         }
