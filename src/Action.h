@@ -21,7 +21,7 @@ class Action:
         {}
 
         virtual ~Action() {}
-        virtual bool pend() const override {
+        virtual bool pending() const override {
             return false;
         }
     private:

@@ -17,7 +17,7 @@ class ICommand:
          */
         virtual ~ICommand() {}
         //virtual bool expired() const = 0;
-        virtual bool pend() const = 0;
+        virtual bool pending() const = 0;
 };
 
 typedef Factory<ICommand, std::tuple<

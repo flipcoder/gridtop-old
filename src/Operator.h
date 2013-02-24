@@ -12,7 +12,7 @@ class Operator:
             m_pWM(std::get<0>(args))
         {}
         virtual ~Operator() {}
-        virtual bool pend() const override {
+        virtual bool pending() const override {
             return true;
         }
     private:

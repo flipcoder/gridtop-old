@@ -14,7 +14,7 @@ class Motion:
 
         virtual ~Motion() {}
 
-        virtual bool pend() const override {
+        virtual bool pending() const override {
             return true;
         }
 

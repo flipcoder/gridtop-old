@@ -6,7 +6,8 @@ using namespace std;
 
 WindowManager :: WindowManager(const Args& args):
     Daemon(args),
-    m_CommandResolver(&m_Commands)
+    m_CommandResolver(&m_Commands),
+    m_PendAlarm(&m_Timeline)
 {
     util::scoped_dtor<WindowManager> dtor(this);
 
@@ -48,7 +49,7 @@ WindowManager :: WindowManager(const Args& args):
 
 void WindowManager :: logic(Freq::Time t)
 {
-    m_PendAlarm.logic(t);
+    m_Timeline.logic(t);
     if(m_PendAlarm.elapsed())
         m_Pending.clear();
 
@@ -84,16 +85,16 @@ WindowManager :: ~WindowManager()
 string WindowManager :: action(const Args& args)
 {
     vector<string> cmd_args = args.other();
-    vector<tuple<WindowManager*, string>> cmd_args_tuple;
-    transform(ENTIRE(cmd_args), std::back_inserter(cmd_args_tuple),
-        [this](const string& s){
-            return make_tuple(this, s);
-        }
-    );
+    //vector<tuple<WindowManager*, string>> cmd_args_tuple;
+    //transform(ENTIRE(cmd_args), std::back_inserter(cmd_args_tuple),
+    //    [this](const string& s){
+    //        return make_tuple(this, s);
+    //    }
+    //);
     
-    for(auto& c: cmd_args_tuple)
+    for(auto& c: cmd_args)
     {
-        auto cmd = m_Commands.create(c);
+        auto cmd = m_Commands.create(make_tuple(this, c));
         if(cmd)
             m_Pending.push_back(cmd);
 
