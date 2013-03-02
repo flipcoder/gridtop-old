@@ -9,6 +9,7 @@
 #include "ICommand.h"
 #include "CommandResolver.h"
 #include "Operator.h"
+#include "Util.h"
 #include <memory>
 #include <vector>
 #include <list>
@@ -25,12 +26,33 @@ class WindowManager:
 
         virtual void run() override;
 
+        enum class eContext: unsigned
+        {
+            WINDOW = 0, //default
+        };
+
         /*
          * Perform the args action on the daemon side
          */
         virtual std::string action(const Args& args) override;
 
         void logic(Freq::Time t) override;
+
+        std::vector<std::shared_ptr<Window>> windows() {
+            return m_Windows;
+        }
+
+        std::shared_ptr<Window> active_window() {
+            auto itr = std::find_if(
+                ENTIRE(m_Windows),
+                [](const std::shared_ptr<Window>& w){
+                    return w->active();
+                }
+            );
+            return (itr != m_Windows.end())?
+                *itr:
+                std::shared_ptr<Window>();
+        }
         
         std::list<std::shared_ptr<ICommand>>& pending() {
             return m_Pending;
@@ -40,6 +62,14 @@ class WindowManager:
         //}
 
         void execute_default_operator();
+
+        //std::vector<std::shared_ptr<Window>> window_matches(
+        //    std::vector<Motion*> motions
+        //);
+
+        std::shared_ptr<Window> next_window(
+            std::vector<Motion*> motions
+        );
 
     private:
 

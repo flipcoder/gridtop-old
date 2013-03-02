@@ -2,6 +2,7 @@
 #include "Util.h"
 #include "Log.h"
 #include "FocusOperator.h"
+#include "Motion.h"
 using namespace std;
 
 WindowManager :: WindowManager(const Args& args):
@@ -48,7 +49,7 @@ void WindowManager :: execute_default_operator()
     m_Pending.push_front(make_shared<FocusOperator>(
         make_tuple(this, string())
     ));
-    (*m_Pending.begin())->execute();
+    m_Pending.front()->execute();
     m_Pending.clear();
     m_PendAlarm.stop();
 }
@@ -60,7 +61,6 @@ void WindowManager :: logic(Freq::Time t)
     {
         if(!m_Pending.empty())
         {
-            LOG("execute!");
             m_Pending.back()->execute();
             m_Pending.clear();
         }
@@ -114,7 +114,7 @@ string WindowManager :: action(const Args& args)
         m_Pending.push_back(cmd);
 
         if(cmd->pending())
-            m_PendAlarm.set(m_PendTime);
+            m_PendAlarm.set(cmd->pend());
         else
         {
             cmd->execute();
@@ -123,5 +123,31 @@ string WindowManager :: action(const Args& args)
         }
     }
     return string();
+}
+
+//vector<shared_ptr<Window>> WindowManager :: window_matches(
+//    const std::vector<Motion*> motions
+//){
+//    return m_Windows;
+//}
+
+std::shared_ptr<Window> WindowManager :: next_window(
+    std::vector<Motion*> motions
+){
+    unsigned motion_bits = 0;
+    for(auto& m: motions)
+        motion_bits |= m->bit();
+
+    Window* active = active_window().get();
+    std::shared_ptr<Window> target;
+
+    if(motion_bits & Motion::bit(eMotion::LEFT))
+    {
+    }
+  
+    return target;
+    // 1) get active window
+    // 2) calculate matching based on motions and window geometry
+    // 3) sort based on motion direction
 }
 

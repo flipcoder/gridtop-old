@@ -1,10 +1,10 @@
-#include "FocusOperator.h"
+#include "MoveOperator.h"
 #include "WindowManager.h"
 #include "Motion.h"
 #include "Util.h"
 using namespace std;
 
-bool FocusOperator :: execute()
+bool MoveOperator :: execute()
 {
     // TODO: check for context hint and run the specific 
     // function (window, workspace?)
@@ -23,15 +23,14 @@ bool FocusOperator :: execute()
         return false;
 
     // TODO: read wm states
-    focus_window(motions);
+    move_window(motions);
     
     return true;
 }
 
-void FocusOperator :: focus_window(const std::vector<Motion*>& motions)
+void MoveOperator :: move_window(const std::vector<Motion*>& motions)
 {
-    auto window = m_pWM->next_window(motions);
-    if(window)
-        window->activate();
+    // TODO: snap active window to grid
+    // TODO: move window along grid in motions' direction(s)
 }
 

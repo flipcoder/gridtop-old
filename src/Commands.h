@@ -6,7 +6,11 @@
 #include "Motions.h"
 #include "Operators.h"
 #include "Hints.h"
+#include "Actions.h"
 
+/*
+ * Interleaved enum containing all command IDs
+ */
 enum class eCommand : unsigned
 {
     MOTION, // -> motion IDs start here! (see Motions.h)
@@ -17,6 +21,9 @@ enum class eCommand : unsigned
 
     HINT, // -> hint IDs start here! (see Hints.h)
     HINTS_END = (HINT + (unsigned)eHint::MAX - 1),
+
+    ACTION,
+    ACTIONS_END = (ACTION + (unsigned)eAction::MAX - 1),
 
     MAX
 };

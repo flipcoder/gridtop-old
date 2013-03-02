@@ -7,12 +7,22 @@
 enum class eOperator : unsigned
 {
     FOCUS = 0, // default
-    //FOCUS = (unsigned)eCommand::OPERATORS_START,
+    MOVE,
+
+    //RESIZE, // prefix +/-
+
+    //CLOSE,
+
     MAX
 };
 
 const std::vector<std::string> g_OperatorString = {
-    "focus"
+    "focus",
+    "move",
+
+    //"resize",
+
+    //"close"
 };
 
 

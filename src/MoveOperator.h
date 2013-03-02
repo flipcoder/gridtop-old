@@ -1,23 +1,23 @@
-#ifndef _FOCUS_OPERATOR_H
-#define _FOCUS_OPERATOR_H
+#ifndef _MOVE_OPERATOR_H
+#define _MOVE_OPERATOR_H
 
 #include "Operator.h"
 #include <glm/glm.hpp>
 
-class FocusOperator:
+class MoveOperator:
     public Operator
 {
     public:
-        explicit FocusOperator(const std::tuple<
+        explicit MoveOperator(const std::tuple<
             WindowManager*,
             std::string>& args
         ):
             Operator(args)
         {}
 
-        virtual ~FocusOperator() {}
+        virtual ~MoveOperator() {}
 
-        void focus_window(const std::vector<Motion*>& motions);
+        void move_window(const std::vector<Motion*>& motions);
 
         virtual bool execute() override;
 };

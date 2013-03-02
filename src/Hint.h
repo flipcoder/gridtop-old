@@ -23,7 +23,7 @@ class Hint:
             return false;
         }
 
-        virtual void execute() override {}
+        virtual bool execute() override {}
     private:
         WindowManager* m_pWM;
 };

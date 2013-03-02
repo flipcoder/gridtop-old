@@ -24,6 +24,7 @@ class Action:
         virtual bool pending() const override {
             return false;
         }
+        virtual bool execute() {}
     private:
         WindowManager* m_pWM;
 };

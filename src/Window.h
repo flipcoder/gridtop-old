@@ -25,7 +25,7 @@ class Window:
         }
 
         glm::vec2 pos() {
-            return m_Pos.get();            
+            return m_Pos.get();
         }
 
         glm::vec2 size() const {

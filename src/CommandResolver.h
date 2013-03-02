@@ -22,7 +22,7 @@ class CommandResolver
         void init_operators(unsigned& offset);
         void init_motions(unsigned& offset);
         void init_hints(unsigned& offset);
-        //void init_actions();
+        void init_actions(unsigned& offset);
 
         Commands* m_pCommands;
         std::map<std::string, unsigned> m_CommandString;

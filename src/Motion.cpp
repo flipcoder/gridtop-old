@@ -11,7 +11,7 @@ Motion :: Motion(const std::tuple<WindowManager*, std::string>& args):
     m_ID = (eMotion)distance(g_MotionString.begin(), itr);
 }
 
-void Motion :: execute()
+bool Motion :: execute()
 {
     auto pending = m_pWM->pending();
 
@@ -23,10 +23,12 @@ void Motion :: execute()
         if(oper)
         {
             oper->execute();
-            return;
+            return true;
         }
     }
 
     m_pWM->execute_default_operator();
+
+    return true;
 }
 

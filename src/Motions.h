@@ -7,14 +7,19 @@
 enum class eMotion : unsigned
 {
     SELF = 0, // default
+
+    // directions
     LEFT,
     RIGHT,
     UP,
     DOWN,
+
+    // edges
     LEFT_EDGE,
     RIGHT_EDGE,
     TOP,
     BOTTOM,
+
     MAX
 };
 
