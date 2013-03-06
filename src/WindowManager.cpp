@@ -3,6 +3,7 @@
 #include "Log.h"
 #include "FocusOperator.h"
 #include "Motion.h"
+#include "Geometry.h"
 using namespace std;
 
 WindowManager :: WindowManager(const Args& args):
@@ -14,6 +15,8 @@ WindowManager :: WindowManager(const Args& args):
 
     // TODO: before we do anything, load in user configuration
     m_PendTime = Freq::Time(1000);
+
+    // TODO: calculate grid
 
     WnckScreen* screen = wnck_screen_get_default();
     wnck_screen_force_update(screen);
@@ -114,12 +117,29 @@ string WindowManager :: action(const Args& args)
         m_Pending.push_back(cmd);
 
         if(cmd->pending())
+        {
             m_PendAlarm.set(cmd->pend());
+        }
         else
         {
             cmd->execute();
-            c.clear();
+            m_Pending.clear();
             m_PendAlarm.stop();
+        }
+
+        // check if any other commands have _stopped_ pending as a result of
+        // the newest entry on the stack (we'll iterate from back to front)
+        for(auto itr = m_Pending.rbegin();
+            itr != m_Pending.rend();
+            ++itr)
+        {
+            if(!(*itr)->pending())
+            {
+                (*itr)->execute();
+                m_Pending.clear();
+                m_PendAlarm.stop();
+                break;
+            }
         }
     }
     return string();
@@ -134,18 +154,45 @@ string WindowManager :: action(const Args& args)
 std::shared_ptr<Window> WindowManager :: next_window(
     std::vector<Motion*> motions
 ){
-    unsigned motion_bits = 0;
-    for(auto& m: motions)
-        motion_bits |= m->bit();
+    unsigned motion_bits = Motion::bits(motions);
 
     Window* active = active_window().get();
+    if(!active)
+        return std::shared_ptr<Window>();
+
     std::shared_ptr<Window> target;
 
     if(motion_bits & Motion::bit(eMotion::LEFT))
     {
+        // TODO: Build line, extrude line to display edge to make zone
+        //  rectangle
+        // Match windows whose centers lie in that zone
+        // if none, extend zone and try again
+
+        Rectangle zone = Rectangle::xywh(
+            0.0f,
+            active->pos().y,
+
+            active->center().x,
+            active->size().y
+        );
+
+        auto wins = windows();
+        // TODO: x_sort
+        // TODO: do window-in-zone overlap test
+    }
+    else if(motion_bits & Motion::bit(eMotion::RIGHT))
+    {
+    }
+    else if(motion_bits & Motion::bit(eMotion::UP))
+    {
+    }
+    else if(motion_bits & Motion::bit(eMotion::DOWN))
+    {
     }
   
     return target;
+
     // 1) get active window
     // 2) calculate matching based on motions and window geometry
     // 3) sort based on motion direction

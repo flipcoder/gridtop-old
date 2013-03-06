@@ -63,6 +63,24 @@ class Window:
 
         void logic(Freq::Time t) override;
 
+        GETSET(bool, respects_border_gap, m_bRespectsBorderGap);
+
+        glm::vec2 center() const {
+            return m_Pos.get() + m_Size.get()/2.0f;
+        }
+
+        glm::vec2 upper_left() const {
+            return m_Pos.get();
+        }
+        glm::vec2 lower_right() const {
+            return m_Pos.get() + m_Size.get();
+        }
+
+        void snap(Freq::Time t = Freq::Time()) {
+            // TODO: snap to grid
+            m_bRespectsBorderGap = true;
+        }
+
     private:
 
         Animation<glm::vec2> m_Pos;
@@ -72,6 +90,8 @@ class Window:
         WindowManager* m_pWindowManager;
 
         mutable std::string m_Name;
+
+        bool m_bRespectsBorderGap = false;
 };
 
 #endif

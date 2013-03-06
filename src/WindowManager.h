@@ -29,6 +29,8 @@ class WindowManager:
         enum class eContext: unsigned
         {
             WINDOW = 0, //default
+            DISPLAY,
+            WORKSPACE
         };
 
         /*
@@ -67,13 +69,29 @@ class WindowManager:
         //    std::vector<Motion*> motions
         //);
 
+        /*
+         * Return the next window match, given the provided motions and the
+         * window manager's current current targeting algorithm
+         */
         std::shared_ptr<Window> next_window(
             std::vector<Motion*> motions
         );
 
+        GETSET(eContext, context, m_Context);
+
+        glm::vec2 workspace_size() const {
+            assert(m_pScreen);
+            return glm::vec2(
+                wnck_screen_get_width(m_pScreen),
+                wnck_screen_get_height(m_pScreen)
+            );
+        }
+
     private:
 
-        WnckScreen* m_pScreen = nullptr;
+        eContext m_Context;
+
+        mutable WnckScreen* m_pScreen = nullptr;
         std::vector<std::shared_ptr<Window>> m_Windows;
 
         Freq::Timeline m_Timeline;

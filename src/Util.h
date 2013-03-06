@@ -9,7 +9,29 @@
 #include <thread>
 #include <boost/algorithm/string.hpp>
 
+// range parameters
 #define ENTIRE(blah) blah.begin(), blah.end()
+
+// accessor
+#define GET(TYPE, PUBLIC_NAME, PRIVATE_NAME) \
+    TYPE PUBLIC_NAME() const {\
+        return PRIVATE_NAME;\
+    }\
+
+// mutator
+#define SET(TYPE, PUBLIC_NAME, PRIVATE_NAME) \
+    void PUBLIC_NAME(TYPE value) {\
+        PRIVATE_NAME = value;\
+    }
+
+// both accessor and mutator
+#define GETSET(TYPE, PUBLIC_NAME, PRIVATE_NAME) \
+    TYPE PUBLIC_NAME() const {\
+        return PRIVATE_NAME;\
+    }\
+    void PUBLIC_NAME(TYPE value) {\
+        PRIVATE_NAME = value;\
+    }
 
 namespace util
 {

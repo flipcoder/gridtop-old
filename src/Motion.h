@@ -29,6 +29,14 @@ class Motion:
         static unsigned bit(eMotion m) {
             return 1<<(unsigned)m;
         }
+
+        template<class Container>
+        static unsigned bits(Container motions) {
+            unsigned r = 0;
+            for(auto& m: motions)
+                r |= m->bit();
+            return r;
+        }
         
         eMotion id() const {
             return m_ID;

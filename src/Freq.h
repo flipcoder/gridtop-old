@@ -161,13 +161,42 @@ public:
         const Timeline* timer() const { return m_pTimer; }
         Timeline* timer() { return m_pTimer; }
         
-        void set(Time t, Timeline* timer = NULL)
+        void set(Time t)
         {
-            if(timer)
-                m_pTimer = timer;
             assert(m_pTimer);
             m_StartTime = m_pTimer->ms();
             m_AlarmTime = m_StartTime + t.ms();
+        }
+
+        /*
+         * Sets an alarm time minimum/floor
+         *
+         * Returns whether or not alarm time was changed (bool)
+         */
+        bool floor(Time t)
+        {
+            assert(m_pTimer);
+            Time r = remaining();
+            if(t > r) {
+                set(t);
+                return true;
+            }
+            return false;
+        }
+        /*
+         * Sets an alarm time maximum/ceiling
+         *
+         * Returns whether or not alarm time was changed (bool)
+         */
+        bool ceiling(Time t)
+        {
+            assert(m_pTimer);
+            Time r = remaining();
+            if(t < r) {
+                set(t);
+                return true;
+            }
+            return false;
         }
 
         void delay(Time t) {
@@ -194,6 +223,9 @@ public:
            set(Time(ms));
         }
         
+        Freq::Time time() const {
+        }
+
         unsigned ms() const
         {
             assert(m_pTimer);
@@ -203,6 +235,9 @@ public:
                 return t;
             }
             return 0L;
+        }
+        Freq::Time remaining() const {
+            return Freq::Time(ms());
         }
         
         float seconds() const

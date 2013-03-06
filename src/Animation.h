@@ -23,7 +23,7 @@ template<class T> class Animation;
  * interpolatable.
  *
  * You define the easing function in the form of:
- *     T func(const T&, const T&, t)
+ *     T func(const T&, const T&, float t)
  * Where t is a value that ranges from 0 to 1.
  *
  * Time is in seconds, but exists on a "timeline", so the actual real time
@@ -163,6 +163,10 @@ class Animation:
         }
 
         virtual ~Animation() {}
+
+        operator T() const {
+            return get();
+        }
 
         virtual void logic(Freq::Time t) override {
             m_Timeline.logic(t);

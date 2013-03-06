@@ -1,10 +1,10 @@
-#include "MoveOperator.h"
+#include "FillOperator.h"
 #include "WindowManager.h"
 #include "Motion.h"
 #include "Util.h"
 using namespace std;
 
-bool MoveOperator :: execute()
+bool FillOperator :: execute()
 {
     // TODO: check for context hint and run the specific 
     // function (window, workspace?)
@@ -23,23 +23,13 @@ bool MoveOperator :: execute()
         return false;
 
     // TODO: read wm states
-    move_window(motions);
+    fill_window(motions);
     
     return true;
 }
 
-void MoveOperator :: move_window(const std::vector<Motion*>& motions)
+void FillOperator :: fill_window(const std::vector<Motion*>& motions)
 {
-    unsigned motion_bits = Motion::bits(motions);
-    if(!motion_bits || motion_bits == Motion::bit(eMotion::SELF))
-    {
-        // TODO: snap window to grid
-        auto active = m_pWM->active_window();
-        if(active)
-            active->snap();
-    }
-
-    // TODO: snap active window to grid
-    // TODO: move window along grid in motions' direction(s)
+    
 }
 
