@@ -18,6 +18,7 @@ class MoveOperator:
         virtual ~MoveOperator() {}
 
         void move_window(const std::vector<Motion*>& motions);
+        void snap_window();
 
         virtual bool execute() override;
 };

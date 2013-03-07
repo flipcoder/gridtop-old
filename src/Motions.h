@@ -6,8 +6,6 @@
 
 enum class eMotion : unsigned
 {
-    SELF = 0, // default
-
     // directions
     LEFT,
     RIGHT,
@@ -24,7 +22,6 @@ enum class eMotion : unsigned
 };
 
 const std::vector<std::string> g_MotionString = {
-    "self",
     "left",
     "right",
     "up",

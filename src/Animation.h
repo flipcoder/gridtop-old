@@ -193,9 +193,16 @@ class Animation:
             return m_Waypoints.empty();
         }
 
-        void stop(){
+        void abort(){
             m_Current = get();
             m_Waypoints.clear();
+        }
+        void stop(){
+            process();
+            if(!m_Waypoints.empty()) {
+                m_Current = m_Waypoints.back().value();
+                m_Waypoints.clear();
+            }
         }
         void stop(const T& position) {
             m_Current = position;

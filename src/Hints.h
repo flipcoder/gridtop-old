@@ -6,12 +6,25 @@
 
 enum class eHint : unsigned
 {
+    // context hints
     WINDOW = 0, // default
+    WORKSPACE,
+
+    // subject hints
+    SELF,
+    OTHERS,
+    ALL,
+
     MAX
 };
 
 const std::vector<std::string> g_HintString = {
-    "window"
+    "window",
+    "workspace",
+
+    "self",
+    "others",
+    "all"
 };
 
 

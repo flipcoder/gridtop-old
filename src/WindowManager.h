@@ -87,6 +87,10 @@ class gtWindowManager:
             );
         }
 
+        WnckScreen* screen() {
+            return m_pScreen;
+        }
+
     private:
 
         eContext m_Context = eContext::WINDOW;

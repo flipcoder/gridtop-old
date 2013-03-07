@@ -43,7 +43,7 @@ class gtWindow:
         void activate(){
             wnck_window_activate(
                 m_pWindow,
-                gdk_x11_display_get_user_time(gdk_display_get_default())
+                GDK_CURRENT_TIME
             );
         }
 

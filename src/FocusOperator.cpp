@@ -1,6 +1,7 @@
 #include "FocusOperator.h"
 #include "WindowManager.h"
 #include "Motion.h"
+#include "Log.h"
 #include "Util.h"
 using namespace std;
 

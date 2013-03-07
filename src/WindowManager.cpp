@@ -14,13 +14,12 @@ gtWindowManager :: gtWindowManager(const Args& args):
     util::scoped_dtor<gtWindowManager> dtor(this);
 
     // TODO: before we do anything, load in user configuration
-    m_PendTime = Freq::Time(1000);
+    m_PendTime = Freq::Time(100);
 
     // TODO: calculate grid
 
-    WnckScreen* screen = wnck_screen_get_default();
-    wnck_screen_force_update(screen);
-    
+    wnck_set_client_type(WNCK_CLIENT_TYPE_PAGER);
+
     m_pScreen = wnck_screen_get_default();
     wnck_screen_force_update(m_pScreen);
 
@@ -59,7 +58,11 @@ void gtWindowManager :: execute_default_operator()
 
 void gtWindowManager :: logic(Freq::Time t)
 {
+    //LOGf("logic, t=%s", t.ms());
     m_Timeline.logic(t);
+
+    wnck_screen_force_update(m_pScreen);
+
     if(m_PendAlarm.elapsed())
     {
         if(!m_Pending.empty())
@@ -83,14 +86,18 @@ void gtWindowManager :: logic(Freq::Time t)
 
 void gtWindowManager:: run()
 {
+    GMainLoop* loop = g_main_loop_new(NULL, false);
+    GMainContext* context = g_main_loop_get_context(loop);
     while(!killed())
     {
         Freq::Time t;
         while(!(t = m_Timer.tick()).ms())
             this_thread::yield();
-        Daemon::run_one();
+        g_main_context_iteration(context, false);
         logic(t);
+        Daemon::run_one();
     }
+    g_main_loop_unref(loop);
 }
 
 gtWindowManager :: ~gtWindowManager()
@@ -174,6 +181,7 @@ std::shared_ptr<gtWindow> gtWindowManager :: next_window(
         Motion::bit(eMotion::LEFT_EDGE) | 
         Motion::bit(eMotion::RIGHT_EDGE)
     )){
+        LOG("horizontal motion");
         sort(ENTIRE(wins), [](
             const shared_ptr<gtWindow>& a, 
             const shared_ptr<gtWindow>& b
@@ -188,6 +196,7 @@ std::shared_ptr<gtWindow> gtWindowManager :: next_window(
         Motion::bit(eMotion::TOP) | 
         Motion::bit(eMotion::BOTTOM)
     )){
+        LOG("vertical motion");
         sort(ENTIRE(wins), [](
             const shared_ptr<gtWindow>& a, 
             const shared_ptr<gtWindow>& b
@@ -201,6 +210,17 @@ std::shared_ptr<gtWindow> gtWindowManager :: next_window(
         return std::shared_ptr<gtWindow>();
     }
 
+    // log some info
+    for(auto& w: wins)
+    {
+        LOGf("%s: p(%s, %s) s(%s, %s)%s",
+            w->name() %
+            w->pos().x % w->pos().y %
+            w->size().x % w->size().y %
+            (w->active()?" <- active":"")
+        );
+    }
+
     auto itr = find_if(ENTIRE(wins), [](const shared_ptr<gtWindow>& w) {
         return w->active();
     });
@@ -211,12 +231,14 @@ std::shared_ptr<gtWindow> gtWindowManager :: next_window(
         Motion::bit(eMotion::LEFT) |
         Motion::bit(eMotion::UP)
     )){
+        LOG("offset (-1)");
         target = (itr - 1 != wins.end()) ? *(itr - 1) : shared_ptr<gtWindow>();
     }
     else if(motion_bits & (
         Motion::bit(eMotion::RIGHT) |
         Motion::bit(eMotion::DOWN)
     )){
+        LOG("offset (+1)");
         target = (itr + 1 != wins.end()) ? *(itr + 1) : shared_ptr<gtWindow>();
     }
     if(!target)
