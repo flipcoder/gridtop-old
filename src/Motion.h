@@ -5,14 +5,14 @@
 #include "Commands.h"
 #include "Util.h"
 #include "Motions.h"
-class WindowManager;
+class gtWindowManager;
 
 class Motion:
     public ICommand
 {
     public:
 
-        explicit Motion(const std::tuple<WindowManager*, std::string>& args);
+        explicit Motion(const std::tuple<gtWindowManager*, std::string>& args);
 
         virtual ~Motion() {}
 
@@ -43,7 +43,7 @@ class Motion:
         }
 
     protected:
-        WindowManager* m_pWM;
+        gtWindowManager* m_pWM;
 
     private:
         eMotion m_ID;

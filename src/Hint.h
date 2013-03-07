@@ -3,7 +3,7 @@
 
 #include "ICommand.h"
 #include "Util.h"
-class WindowManager;
+class gtWindowManager;
 
 class Hint:
     public ICommand
@@ -11,7 +11,7 @@ class Hint:
     public:
 
         explicit Hint(
-            const std::tuple<WindowManager*,
+            const std::tuple<gtWindowManager*,
             std::string>& args
         ) {}
 
@@ -24,8 +24,8 @@ class Hint:
         }
 
         virtual bool execute() override {}
-    private:
-        WindowManager* m_pWM;
+    protected:
+        gtWindowManager* m_pWM;
 };
 
 #endif

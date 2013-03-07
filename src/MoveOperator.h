@@ -9,7 +9,7 @@ class MoveOperator:
 {
     public:
         explicit MoveOperator(const std::tuple<
-            WindowManager*,
+            gtWindowManager*,
             std::string>& args
         ):
             Operator(args)

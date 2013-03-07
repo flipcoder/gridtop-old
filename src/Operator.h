@@ -9,7 +9,7 @@ class Operator:
     public ICommand
 {
     public:
-        explicit Operator(const std::tuple<WindowManager*, std::string>& args):
+        explicit Operator(const std::tuple<gtWindowManager*, std::string>& args):
             m_pWM(std::get<0>(args))
         {}
         virtual ~Operator() {}
@@ -17,7 +17,7 @@ class Operator:
             return true;
         }
     protected:
-        WindowManager* m_pWM;
+        gtWindowManager* m_pWM;
 };
 
 #endif

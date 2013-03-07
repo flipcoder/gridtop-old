@@ -6,14 +6,14 @@
 #include "Animation.h"
 #include "Args.h"
 
-class WindowManager;
+class gtWindowManager;
 
-class Window:
+class gtWindow:
     public IRealtime
 {
     public:
-        explicit Window(WnckWindow* wnck_window, WindowManager* wm);
-        virtual ~Window() {}
+        explicit gtWindow(WnckWindow* wnck_window, gtWindowManager* wm);
+        virtual ~gtWindow() {}
 
         std::string name() const {
             if(!wnck_window_has_name(m_pWindow)) {
@@ -41,7 +41,10 @@ class Window:
         }
 
         void activate(){
-            //wnck_window_activate(m_pWindow);
+            wnck_window_activate(
+                m_pWindow,
+                gdk_x11_display_get_user_time(gdk_display_get_default())
+            );
         }
 
         bool active() const {
@@ -87,7 +90,7 @@ class Window:
         Animation<glm::vec2> m_Size;
 
         mutable WnckWindow* m_pWindow;
-        WindowManager* m_pWindowManager;
+        gtWindowManager* m_pWindowManager;
 
         mutable std::string m_Name;
 

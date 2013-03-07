@@ -6,7 +6,7 @@
 #include <tuple>
 #include <string>
 #include <boost/optional.hpp>
-class WindowManager;
+class gtWindowManager;
 
 class ICommand:
     public IRealtime
@@ -49,7 +49,7 @@ class ICommand:
 };
 
 typedef Factory<ICommand, std::tuple<
-    WindowManager*,
+    gtWindowManager*,
     std::string
 >> Commands;
 

@@ -2,7 +2,7 @@
 #define _ACTION_H
 
 #include "ICommand.h"
-class WindowManager;
+class gtWindowManager;
 
 /*
  *  Special actions that don't fit into operators or motions
@@ -16,7 +16,7 @@ class Action:
     public ICommand
 {
     public:
-        explicit Action(const std::tuple<WindowManager*, std::string>& args):
+        explicit Action(const std::tuple<gtWindowManager*, std::string>& args):
             m_pWM(std::get<0>(args))
         {}
 
@@ -26,7 +26,7 @@ class Action:
         }
         virtual bool execute() {}
     private:
-        WindowManager* m_pWM;
+        gtWindowManager* m_pWM;
 };
 
 #endif

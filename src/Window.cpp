@@ -4,7 +4,7 @@
 using namespace std;
 using namespace glm;
 
-Window :: Window(WnckWindow* wnck_window, WindowManager* wm):
+gtWindow :: gtWindow(WnckWindow* wnck_window, gtWindowManager* wm):
     m_pWindow(wnck_window),
     m_pWindowManager(wm)
 {
@@ -13,7 +13,7 @@ Window :: Window(WnckWindow* wnck_window, WindowManager* wm):
     //LOGf("window name: %s", wnck_window_get_name(m_pWindow));
 }
 
-void Window :: logic(Freq::Time t)
+void gtWindow :: logic(Freq::Time t)
 {
     // process animation first
     m_Pos.logic(t);

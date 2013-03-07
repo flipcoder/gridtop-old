@@ -15,14 +15,14 @@
 #include <list>
 #include <string>
 
-class WindowManager:
+class gtWindowManager:
     public IRealtime,
     public Daemon
 {
     public:
         
-        WindowManager(const Args& args);
-        virtual ~WindowManager();
+        gtWindowManager(const Args& args);
+        virtual ~gtWindowManager();
 
         virtual void run() override;
 
@@ -40,20 +40,20 @@ class WindowManager:
 
         void logic(Freq::Time t) override;
 
-        std::vector<std::shared_ptr<Window>> windows() {
+        std::vector<std::shared_ptr<gtWindow>> windows() {
             return m_Windows;
         }
 
-        std::shared_ptr<Window> active_window() {
+        std::shared_ptr<gtWindow> active_window() {
             auto itr = std::find_if(
                 ENTIRE(m_Windows),
-                [](const std::shared_ptr<Window>& w){
+                [](const std::shared_ptr<gtWindow>& w){
                     return w->active();
                 }
             );
             return (itr != m_Windows.end())?
                 *itr:
-                std::shared_ptr<Window>();
+                std::shared_ptr<gtWindow>();
         }
         
         std::list<std::shared_ptr<ICommand>>& pending() {
@@ -65,7 +65,7 @@ class WindowManager:
 
         void execute_default_operator();
 
-        //std::vector<std::shared_ptr<Window>> window_matches(
+        //std::vector<std::shared_ptr<gtWindow>> window_matches(
         //    std::vector<Motion*> motions
         //);
 
@@ -73,7 +73,7 @@ class WindowManager:
          * Return the next window match, given the provided motions and the
          * window manager's current current targeting algorithm
          */
-        std::shared_ptr<Window> next_window(
+        std::shared_ptr<gtWindow> next_window(
             std::vector<Motion*> motions
         );
 
@@ -89,10 +89,10 @@ class WindowManager:
 
     private:
 
-        eContext m_Context;
+        eContext m_Context = eContext::WINDOW;
 
         mutable WnckScreen* m_pScreen = nullptr;
-        std::vector<std::shared_ptr<Window>> m_Windows;
+        std::vector<std::shared_ptr<gtWindow>> m_Windows;
 
         Freq::Timeline m_Timeline;
         Freq::Alarm m_PendAlarm;

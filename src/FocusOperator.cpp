@@ -14,9 +14,8 @@ bool FocusOperator :: execute()
     for(auto& cmd: pending)
     {
         auto motion = dynamic_cast<Motion*>(cmd.get());
-        motions.push_back(motion);
-        //if(motion)
-        //    motions |= motion->bit();
+        if(motion)
+            motions.push_back(motion);
     }
 
     if(motions.empty())

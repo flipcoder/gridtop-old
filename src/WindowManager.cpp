@@ -6,12 +6,12 @@
 #include "Geometry.h"
 using namespace std;
 
-WindowManager :: WindowManager(const Args& args):
+gtWindowManager :: gtWindowManager(const Args& args):
     Daemon(args),
     m_CommandResolver(&m_Commands),
     m_PendAlarm(&m_Timeline)
 {
-    util::scoped_dtor<WindowManager> dtor(this);
+    util::scoped_dtor<gtWindowManager> dtor(this);
 
     // TODO: before we do anything, load in user configuration
     m_PendTime = Freq::Time(1000);
@@ -34,7 +34,7 @@ WindowManager :: WindowManager(const Args& args):
         if(!(flags & WNCK_WINDOW_DESKTOP) &&
            !(flags & WNCK_WINDOW_DOCK))
         {
-            m_Windows.emplace_back(make_shared<Window>(win, this));
+            m_Windows.emplace_back(make_shared<gtWindow>(win, this));
             //if(active_window && (win == active_window)) {
                 //m_ActiveWindowIndex = m_Windows.size();
                 //m_pActiveWindow = m_Windows.back();
@@ -45,7 +45,7 @@ WindowManager :: WindowManager(const Args& args):
     dtor.resolve();
 }
 
-void WindowManager :: execute_default_operator()
+void gtWindowManager :: execute_default_operator()
 {
     // TODO: probably better to insert left of the motions
     //       but this is good for now
@@ -57,7 +57,7 @@ void WindowManager :: execute_default_operator()
     m_PendAlarm.stop();
 }
 
-void WindowManager :: logic(Freq::Time t)
+void gtWindowManager :: logic(Freq::Time t)
 {
     m_Timeline.logic(t);
     if(m_PendAlarm.elapsed())
@@ -81,9 +81,9 @@ void WindowManager :: logic(Freq::Time t)
         win->logic(t);
 }
 
-void WindowManager:: run()
+void gtWindowManager:: run()
 {
-    while(true)
+    while(!killed())
     {
         Freq::Time t;
         while(!(t = m_Timer.tick()).ms())
@@ -93,21 +93,26 @@ void WindowManager:: run()
     }
 }
 
-WindowManager :: ~WindowManager()
+gtWindowManager :: ~gtWindowManager()
 {
     wnck_shutdown();
 }
 
-string WindowManager :: action(const Args& args)
+string gtWindowManager :: action(const Args& args)
 {
+    if(args.has("-q") || args.has("--quit") || args.has("quit")) {
+        kill();
+        return string();
+    }
+
     vector<string> cmd_args = args.other();
-    //vector<tuple<WindowManager*, string>> cmd_args_tuple;
+    //vector<tuple<gtWindowManager*, string>> cmd_args_tuple;
     //transform(ENTIRE(cmd_args), std::back_inserter(cmd_args_tuple),
     //    [this](const string& s){
     //        return make_tuple(this, s);
     //    }
     //);
-    
+
     for(auto& c: cmd_args)
     {
         auto cmd = m_Commands.create(make_tuple(this, c));
@@ -145,51 +150,106 @@ string WindowManager :: action(const Args& args)
     return string();
 }
 
-//vector<shared_ptr<Window>> WindowManager :: window_matches(
+//vector<shared_ptr<gtWindow>> gtWindowManager :: window_matches(
 //    const std::vector<Motion*> motions
 //){
 //    return m_Windows;
 //}
 
-std::shared_ptr<Window> WindowManager :: next_window(
+std::shared_ptr<gtWindow> gtWindowManager :: next_window(
     std::vector<Motion*> motions
 ){
     unsigned motion_bits = Motion::bits(motions);
+    auto wins = windows();
 
-    Window* active = active_window().get();
-    if(!active)
-        return std::shared_ptr<Window>();
+    if(!active_window())
+        return std::shared_ptr<gtWindow>();
 
-    std::shared_ptr<Window> target;
+    std::shared_ptr<gtWindow> target;
 
-    if(motion_bits & Motion::bit(eMotion::LEFT))
-    {
-        // TODO: Build line, extrude line to display edge to make zone
-        //  rectangle
-        // Match windows whose centers lie in that zone
-        // if none, extend zone and try again
-
-        Rectangle zone = Rectangle::xywh(
-            0.0f,
-            active->pos().y,
-
-            active->center().x,
-            active->size().y
-        );
-
-        auto wins = windows();
-        // TODO: x_sort
-        // TODO: do window-in-zone overlap test
+    // horizontal
+    if(motion_bits & (
+        Motion::bit(eMotion::LEFT) |
+        Motion::bit(eMotion::RIGHT) | 
+        Motion::bit(eMotion::LEFT_EDGE) | 
+        Motion::bit(eMotion::RIGHT_EDGE)
+    )){
+        sort(ENTIRE(wins), [](
+            const shared_ptr<gtWindow>& a, 
+            const shared_ptr<gtWindow>& b
+        ){
+            return a->center().x < b->center().x;
+        });
     }
-    else if(motion_bits & Motion::bit(eMotion::RIGHT))
-    {
+    // vertical
+    else if(motion_bits & (
+        Motion::bit(eMotion::UP) |
+        Motion::bit(eMotion::DOWN) | 
+        Motion::bit(eMotion::TOP) | 
+        Motion::bit(eMotion::BOTTOM)
+    )){
+        sort(ENTIRE(wins), [](
+            const shared_ptr<gtWindow>& a, 
+            const shared_ptr<gtWindow>& b
+        ){
+            return a->center().y < b->center().y;
+        });
     }
-    else if(motion_bits & Motion::bit(eMotion::UP))
+    else
     {
+        WARN("unsorted window list");
+        return std::shared_ptr<gtWindow>();
     }
-    else if(motion_bits & Motion::bit(eMotion::DOWN))
-    {
+
+    auto itr = find_if(ENTIRE(wins), [](const shared_ptr<gtWindow>& w) {
+        return w->active();
+    });
+    assert(itr != wins.end());
+
+    // negative direction
+    if(motion_bits & (
+        Motion::bit(eMotion::LEFT) |
+        Motion::bit(eMotion::UP)
+    )){
+        target = (itr - 1 != wins.end()) ? *(itr - 1) : shared_ptr<gtWindow>();
     }
+    else if(motion_bits & (
+        Motion::bit(eMotion::RIGHT) |
+        Motion::bit(eMotion::DOWN)
+    )){
+        target = (itr + 1 != wins.end()) ? *(itr + 1) : shared_ptr<gtWindow>();
+    }
+    if(!target)
+        WARN("no target");
+
+    //if(motion_bits & Motion::bit(eMotion::LEFT))
+    //{
+    //    // TODO: Build line, extrude line to display edge to make zone
+    //    //  rectangle
+    //    // Match windows whose centers lie in that zone
+    //    // if none, extend zone and try again
+
+    //    Rectangle zone = Rectangle::ltrb(
+    //        0.0f,
+    //        active->pos().y,
+
+    //        active->center().x,
+    //        active->size().y
+    //    );
+
+    //    // TODO: x_sort
+        
+    //    // TODO: do window-in-zone overlap test
+    //}
+    //else if(motion_bits & Motion::bit(eMotion::RIGHT))
+    //{
+    //}
+    //else if(motion_bits & Motion::bit(eMotion::UP))
+    //{
+    //}
+    //else if(motion_bits & Motion::bit(eMotion::DOWN))
+    //{
+    //}
   
     return target;
 

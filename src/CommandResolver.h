@@ -4,7 +4,7 @@
 #include "ICommand.h"
 #include "Commands.h"
 #include <map>
-class WindowManager;
+class gtWindowManager;
 
 class CommandResolver
 {
@@ -13,7 +13,7 @@ class CommandResolver
         virtual ~CommandResolver(){}
 
         unsigned resolve(
-            const std::tuple<WindowManager*,
+            const std::tuple<gtWindowManager*,
             std::string>& args
         ) const;
 

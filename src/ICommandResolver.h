@@ -7,7 +7,7 @@ class ICommandResolver
         virtual ~ICommandResolver() {}
 
         virtual unsigned resolve(
-            const std::tuple<WindowManager*,
+            const std::tuple<gtWindowManager*,
             std::string>& args
         ) const = 0;
 

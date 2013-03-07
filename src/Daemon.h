@@ -49,7 +49,16 @@ class Daemon:
          */
         static void pipe(const Args& args);
 
+        void kill(bool k = true) {
+            m_bKill = k;
+        }
+        bool killed() const {
+            return m_bKill;
+        }
+
     private:
+
+        bool m_bKill = false;
 
         const static int MAX_RETRY= 5;
 

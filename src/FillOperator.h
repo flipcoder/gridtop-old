@@ -9,7 +9,7 @@ class FillOperator:
 {
     public:
         explicit FillOperator(const std::tuple<
-            WindowManager*,
+            gtWindowManager*,
             std::string>& args
         ):
             Operator(args)

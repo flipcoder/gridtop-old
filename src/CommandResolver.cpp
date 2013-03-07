@@ -73,7 +73,7 @@ void CommandResolver :: init_actions(unsigned& offset)
 
 unsigned CommandResolver :: resolve(
     const std::tuple<
-        WindowManager*,
+        gtWindowManager*,
         std::string
     >& args
 ) const {

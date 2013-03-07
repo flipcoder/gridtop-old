@@ -8,6 +8,14 @@ struct Rectangle
 {
     public:
 
+        enum class Side
+        {
+            LEFT = 0,
+            TOP = 1,
+            RIGHT = 2,
+            BOTTOM = 3
+        };
+
         Rectangle():
             m_x(0),
             m_y(0),
@@ -83,6 +91,39 @@ struct Rectangle
         GETSET(int, y, m_y);
         GETSET(int, w, m_w);
         GETSET(int, h, m_h);
+
+        void side(Side s, int pos) {
+            switch(s)
+            {
+                case Side::LEFT:
+                    m_x = pos;
+                    break;
+                case Side::RIGHT:
+                    break;
+                case Side::TOP:
+                    m_y = pos;
+                    break;
+                case Side::BOTTOM:
+                    break;
+                default:
+                    assert(false);
+            };
+        }
+        int side(Side s) const {
+            switch(s)
+            {
+                case Side::LEFT:
+                    return m_x;
+                case Side::RIGHT:
+                    return m_x+m_w-1;
+                case Side::TOP:
+                    return m_y;
+                case Side::BOTTOM:
+                    return m_y+m_h-1;
+                default:
+                    assert(false);
+            };
+        }
 
     private:
         int m_x, m_y, m_w, m_h;

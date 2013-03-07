@@ -20,7 +20,7 @@ int main(int argc, const char** argv)
     if(args.has("-D")) // run _as_ daemon process (instead of forking)
     {
         try {
-            auto daemon = std::make_shared<WindowManager>(args);
+            auto daemon = std::make_shared<gtWindowManager>(args);
             daemon->run();
         } catch(const Error&) {
         } catch(const std::exception& e) {
@@ -36,6 +36,7 @@ int main(int argc, const char** argv)
         try{
             Daemon::ensure_process();
         } catch(const Error&) {
+            // logged when thrown
         } catch(const std::exception& e) {
             ERROR(GENERAL, e.what());
             return 1;
@@ -44,7 +45,15 @@ int main(int argc, const char** argv)
     }
 
     if(!args.empty())
-        Daemon::pipe(args);
+    {
+        if(args.has("-q") || args.has("--quit") || args.has("quit"))
+        {
+            if(Daemon::is_running())
+                Daemon::pipe(args);
+        }
+        else
+            Daemon::pipe(args);
+    }
     
     return 0;
 }

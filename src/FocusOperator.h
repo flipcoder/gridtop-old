@@ -9,7 +9,7 @@ class FocusOperator:
 {
     public:
         explicit FocusOperator(const std::tuple<
-            WindowManager*,
+            gtWindowManager*,
             std::string>& args
         ):
             Operator(args)

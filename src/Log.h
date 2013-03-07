@@ -70,7 +70,7 @@ public:
 #define WARN(X) Log::get().warn(X)
 #define WARNf(X,Y) Log::get().warn((boost::format(X) % Y).str())
 #define ERROR(CODE,X) {\
-    Log::get().error(X);\
+    Log::get().error(ErrorCode::CODE, X);\
     throw Error(ErrorCode::CODE, X);\
 }
 #define ERRORf(CODE,X,Y) {\
